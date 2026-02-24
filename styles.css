@@ -108,6 +108,7 @@
   line-height: 1.58;
   color: #15283f;
   word-break: break-word;
+  white-space: pre-line;
 }
 
 #tp-translate-popup .tp-popup-error {

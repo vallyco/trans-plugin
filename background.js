@@ -18,6 +18,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 async function translateToChinese(text) {
+  const normalizedText = text.trim();
+  if (isSingleWord(normalizedText)) {
+    try {
+      const meanings = await lookupWordMeanings(normalizedText);
+      if (meanings) {
+        return meanings;
+      }
+    } catch (_error) {
+      // Fall through to translation flow.
+    }
+  }
+
   const config = await chrome.storage.local.get(["youdaoAppKey", "youdaoAppSecret"]);
   const appKey = typeof config.youdaoAppKey === "string" ? config.youdaoAppKey.trim() : "";
   const appSecret =
@@ -25,7 +37,7 @@ async function translateToChinese(text) {
 
   if (appKey && appSecret) {
     try {
-      const officialText = await translateByOfficialOpenApi(text, appKey, appSecret);
+      const officialText = await translateByOfficialOpenApi(normalizedText, appKey, appSecret);
       if (officialText) {
         return officialText;
       }
@@ -38,10 +50,10 @@ async function translateToChinese(text) {
   const primaryBody = new URLSearchParams({
     doctype: "json",
     type: "AUTO",
-    i: text
+    i: normalizedText
   }).toString();
   const fallbackUrl =
-    "https://dict.youdao.com/jsonapi" + `?q=${encodeURIComponent(text)}`;
+    "https://dict.youdao.com/jsonapi" + `?q=${encodeURIComponent(normalizedText)}`;
 
   const errors = [];
 
@@ -74,7 +86,7 @@ async function translateToChinese(text) {
   }
 
   try {
-    const segmented = await translateBySegments(text);
+    const segmented = await translateBySegments(normalizedText);
     if (segmented) {
       return segmented;
     }
@@ -208,6 +220,47 @@ function extractFallbackTranslation(data) {
   }
 
   return "";
+}
+
+function isSingleWord(text) {
+  return /^[A-Za-z]+(?:['-][A-Za-z]+)*$/.test(text);
+}
+
+async function lookupWordMeanings(word) {
+  const data = await requestJson(
+    "https://dict.youdao.com/jsonapi" + `?q=${encodeURIComponent(word)}`
+  );
+  const meanings = extractWordMeaningItems(data);
+  if (meanings.length === 0) {
+    return "";
+  }
+
+  return meanings.map((item, index) => `${index + 1}. ${item}`).join("\n");
+}
+
+function extractWordMeaningItems(data) {
+  if (!Array.isArray(data?.ec?.word) || data.ec.word.length === 0) {
+    return [];
+  }
+
+  const trs = data.ec.word
+    .flatMap((entry) => entry?.trs || [])
+    .flatMap((entry) => entry?.tr || []);
+
+  const items = trs
+    .map((entry) => {
+      const pos = typeof entry?.pos === "string" ? entry.pos.trim() : "";
+      const meaning = Array.isArray(entry?.l?.i)
+        ? entry.l.i.map((part) => String(part || "").trim()).filter(Boolean).join("；")
+        : "";
+      if (!meaning) {
+        return "";
+      }
+      return pos ? `${pos} ${meaning}` : meaning;
+    })
+    .filter(Boolean);
+
+  return Array.from(new Set(items)).slice(0, 8);
 }
 
 async function translateByOfficialOpenApi(text, appKey, appSecret) {
