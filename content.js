@@ -149,6 +149,9 @@ function handleTranslationButtonClick() {
 
   // Set popup visibility immediately to prevent mouseup from showing button again
   isPopupVisible = true;
+  
+  // Set translating flag to block all mouseup processing until translation starts
+  isTranslating = true;
 
   // Then start the translation process
   setTimeout(() => {
