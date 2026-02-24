@@ -147,6 +147,9 @@ function handleTranslationButtonClick() {
     debugLog('Button hidden immediately after click');
   }
 
+  // Set popup visibility immediately to prevent mouseup from showing button again
+  isPopupVisible = true;
+
   // Then start the translation process
   setTimeout(() => {
     handleTranslation();
@@ -192,7 +195,6 @@ async function handleTranslation() {
 
   debugLog('About to call showTranslationPopup with "Translating..."');
   showTranslationPopup('Translating...', position.x, position.y);
-  isPopupVisible = true; // Set popup visibility flag
   debugLog('After showTranslationPopup call - translationDiv is null?', (translationDiv === null).toString());
   debugLog('After showTranslationPopup call - translationDiv exists in DOM?', (translationDiv && document.body.contains(translationDiv)).toString());
 
