@@ -1,115 +1,21 @@
-```instructions
-# Copilot Instructions for trans-plugin
-
-This repository is a small Chrome extension (Manifest V3) that detects selected text on any webpage and shows a translation popup using the public Google Translate endpoint. Below are focused, actionable facts and examples to help an AI coding agent be productive immediately.
-
-1) Big picture
-- Purpose: content script (`content.js`) runs on all pages, detects text selection, renders a green translate button (`#translate-button`) and a translation popup (`#text-translation-popup`). `popup.html`/`popup.js` are minimal and provide the browser-action popup.
-- Data flow: user selection -> `mouseup` handler (capture phase) -> selection range -> `translate` button click -> `translateText()` -> `callGoogleTranslate()` fetch -> parsed response -> update `.translation-text` inside the popup.
-
-2) Key files to edit or inspect
-- `manifest.json` (MV3, `content_scripts` inject `content.js`, `styles.css`, host permission for `https://translate.googleapis.com/*`).
-- `content.js` (core behavior: selection detection, UI creation, fetch + parsing, timeouts, debug logging).
-- `styles.css` (visual styles for `#translate-button` and `#text-translation-popup`).
-- `popup.html` / `popup.js` (extension action UI; minimal).
-
-3) Important implementation details and conventions
-- UI element ids/classes: `translate-button`, `text-translation-popup`, `.translation-text`, `.close-btn`. Update these strings consistently when changing UI code or CSS.
-- Positioning: the code uses `range.getClientRects()` and positions the button under the last rect; the popup assumes a width of 300 and height of 150 when calculating bounds. Keep these numbers in mind when changing layout.
-- Flags & flow control: `isTranslating`, `isPopupVisible`, and `buttonClicked` are used to avoid duplicate UI creation and races. Respect/set these flags when modifying translation lifecycle.
-- Networking: uses `https://translate.googleapis.com/translate_a/single` with an 8s AbortController timeout. The response is parsed as nested arrays; code aggregates text across `data[0]` entries. When adding alternative APIs, preserve parsing fallbacks.
-- Debugging: use `debugLog()` which prefixes logs with `[Translation Plugin]`. Agent changes should maintain this helper or mirror its format.
-- Event listeners: `document` handlers used are `mouseup` (capture phase), `click`, and `keyup` (Escape to close). Be careful with `true` capture on `mouseup`—it was intentional to detect selection early.
-- z-index and containment: UI uses `position: fixed` and high `z-index` (~1000000). Avoid lower z-index that could cause overlay issues.
-
-4) Developer workflows
-- No build/install step. To test locally: open `chrome://extensions`, enable Developer mode, click "Load unpacked" and point to the repository folder.
-- After edits to `content.js`/`styles.css`, reload the extension on `chrome://extensions` and refresh the target page. Use DevTools Console to view logs prefixed with `[Translation Plugin]`.
-- Network debugging: translation requests go to `translate.googleapis.com`—use DevTools Network tab to inspect responses and CORS issues.
-
-5) Safe edit patterns & examples
-- Example: to update popup text, modify `content.js` at the `showTranslationPopup()` function—update `.translation-text` rather than recreating the whole DOM to preserve listeners.
-- Example: when changing timeout or retry logic, update both `callGoogleTranslate()` timeout and fallback checks in `translateText()` (they rely on searching the returned string for failure markers like `Translation failed` or `ERR_`).
-
-6) What not to change lightly
-- `manifest.json` permissions and `host_permissions`—removing `translate.googleapis.com` will break runtime translation requests.
-- The `mouseup` handler capture flag (`true`)—changing to bubbling may miss selection timing and break placement logic.
-
-7) Tests and CI
-- There are no automated tests or build scripts in the repo. Prefer small, manual changes and validate in Chrome DevTools.
-
-8) Example quick tasks for an AI agent
-- Add a short debounce to the `mouseup` selection logic to reduce flicker (modify the 50ms `setTimeout`).
-- Add a small retry mechanism on `callGoogleTranslate()` that waits 500ms and retries once on network failures.
-- Improve accessibility: add `aria-label` to `#translate-button` and ensure the popup can be closed via keyboard.
-
-If anything in this file is unclear or you'd like more examples (e.g., exact DOM snippets to edit or a suggested retry implementation), tell me which area to expand.
-
+```md
 ---
-Quick reference (concrete values)
-- Popup assumed size: width=300px, height=150px — used for boundary math in `showTranslationPopup()`.
-- Translate button z-index: `1000000`; popup z-index: `10000`.
-- Network timeout: 8000ms (AbortController) in `callGoogleTranslate()`.
-- Selection delay: `setTimeout(..., 50)` inside `mouseup` handler (capture phase).
+description: 这个文件描述了一个Chrome浏览器插件的功能需求。
+applyTo: **/*.js, **/*.html
+---
 
-Developer steps to test changes
+一、写一个chrome浏览器插件，实现功能：
+1. 网页中选择文本后，对应位置弹出一个小图标，点击图标后，使用google 翻译将选中的文本翻译成中文，结果在一个弹窗中显示。
+2. 点击图标后，图标消失，弹窗显示翻译结果。
+3. 弹窗中有一个关闭按钮，点击后弹窗消失。
+4. 插件需要支持在所有网页上使用。
 
-```bash
-# Load/unload extension (manual steps)
-# 1. Open chrome://extensions
-# 2. Enable Developer mode
-# 3. Click "Load unpacked" and select this repo folder
-# 4. Edit files, then click reload for this extension and refresh the target page
+二、每次操作代码文件时，执行git指令，提交代码并推送到远程仓库
+每次commit时，提交信息参照以下格式：
+```
+feat: 添加了chrome浏览器插件，实现了文本翻译功能
+fix: 修复了弹窗显示问题
+docs: 更新了README文件，添加了插件使用说明
 ```
 
-Git Workflow for Changes
-
-After making code changes, follow these steps:
-
-1. Stage your changes:
-```bash
-git add .
-```
-
-2. Commit with descriptive message (follow convention):
-```bash
-# Types: feat (new feature), fix (bug fix), refactor (code refactoring), docs (documentation)
-git commit -m "feat: add new translation feature"
-git commit -m "fix: resolve popup timing issue"
-git commit -m "docs: update developer documentation"
-```
-
-3. Push to remote repository:
-```bash
-git push origin master
-```
-
-**Full workflow example:**
-```bash
-# Edit files in your editor
-# After making changes...
-git add content.js styles.css
-git commit -m "fix: improve button positioning"
-git push origin master
-```
-
-**Verify before pushing:**
-```bash
-git status          # Check what's staged
-git diff --cached   # Review staged changes
-git log --oneline -3  # See recent commits
-```
-
-Small code-edit patterns the agent should follow
-- When updating popup text: modify `.translation-text` in `showTranslationPopup()` instead of rebuilding the element (preserves listeners).
-- Preserve `debugLog()` or mirror its `[Translation Plugin]` prefix for all console traces.
-- Keep `mouseup` listener with `capture=true` — changing to bubbling breaks timing/positioning.
-
-Suggested low-effort improvements (ask if you want one implemented)
-- Add a single retry with 500ms delay in `callGoogleTranslate()` for transient network issues.
-- Add `aria-label="Translate selection"` to `#translate-button` and make the button focusable for keyboard users.
-- Extract magic numbers (popup size, timeouts, z-index) to top-level constants in `content.js` for easier tuning.
-
-If you'd like, I can implement one of the suggested improvements and add a short test plan for manual verification.
-
-```
+```md
