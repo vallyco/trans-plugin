@@ -5,7 +5,8 @@
   "version": "1.0.0",
   "permissions": ["activeTab"],
   "host_permissions": [
-    "https://fanyi.youdao.com/*"
+    "https://fanyi.youdao.com/*",
+    "https://dict.youdao.com/*"
   ],
   "background": {
     "service_worker": "background.js"
