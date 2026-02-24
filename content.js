@@ -140,17 +140,21 @@ function handleTranslationButtonClick() {
   // Mark that button was clicked to prevent recreation
   buttonClicked = true;
 
-  // Immediately hide the button
+  // Immediately hide the button by setting display to none (fail-safe)
+  if (translateButton) {
+    translateButton.style.display = 'none';
+    debugLog('Button display set to none');
+  }
+
+  // Immediately remove the button from DOM
   if (translateButton && document.body.contains(translateButton)) {
     document.body.removeChild(translateButton);
     translateButton = null;
-    debugLog('Button hidden immediately after click');
+    debugLog('Button removed from DOM');
   }
 
-  // Set popup visibility immediately to prevent mouseup from showing button again
+  // Set popup visibility and translating flags
   isPopupVisible = true;
-  
-  // Set translating flag to block all mouseup processing until translation starts
   isTranslating = true;
 
   // Then start the translation process
