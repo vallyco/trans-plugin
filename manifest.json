@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "permissions": ["activeTab"],
   "host_permissions": [
-    "https://translate.googleapis.com/*"
+    "https://fanyi.youdao.com/*"
   ],
   "background": {
     "service_worker": "background.js"

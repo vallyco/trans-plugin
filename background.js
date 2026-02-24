@@ -19,8 +19,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 async function translateToChinese(text) {
   const url =
-    "https://translate.googleapis.com/translate_a/single" +
-    `?client=gtx&sl=auto&tl=zh-CN&dt=t&q=${encodeURIComponent(text)}`;
+    "https://fanyi.youdao.com/translate" +
+    `?doctype=json&type=AUTO&i=${encodeURIComponent(text)}`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -28,12 +28,13 @@ async function translateToChinese(text) {
   }
 
   const data = await response.json();
-  if (!Array.isArray(data) || !Array.isArray(data[0])) {
+  if (!data || !Array.isArray(data.translateResult)) {
     throw new Error("Unexpected translation response");
   }
 
-  const translatedText = data[0]
-    .map((part) => (Array.isArray(part) ? part[0] : ""))
+  const translatedText = data.translateResult
+    .flat()
+    .map((part) => (part && typeof part.tgt === "string" ? part.tgt : ""))
     .join("")
     .trim();
 
