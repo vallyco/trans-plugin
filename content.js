@@ -135,7 +135,16 @@ function showPopup(content, top, left, isError) {
   translatePopup = popup;
 }
 
-document.addEventListener("mouseup", () => {
+document.addEventListener("mouseup", (event) => {
+  const target = event.target;
+  if (target instanceof Element) {
+    const clickedDot = target.closest("#tp-translate-dot");
+    const clickedPopup = target.closest("#tp-translate-popup");
+    if (clickedDot || clickedPopup) {
+      return;
+    }
+  }
+
   const selection = window.getSelection();
   const text = selection ? selection.toString().trim() : "";
 
