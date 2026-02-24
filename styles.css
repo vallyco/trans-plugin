@@ -1,61 +1,156 @@
 #tp-translate-dot {
   position: absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+  width: 18px;
+  height: 18px;
   border: none;
-  background: #1db954;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 30%, #9ffad9 0%, #36d79c 40%, #1ca86f 100%);
+  box-shadow:
+    0 8px 18px rgba(16, 122, 82, 0.35),
+    0 0 0 2px rgba(255, 255, 255, 0.92);
   cursor: pointer;
   z-index: 2147483647;
+  transform: translateY(0) scale(1);
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+  animation: tp-dot-in 140ms ease-out;
+}
+
+#tp-translate-dot:hover {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow:
+    0 10px 20px rgba(16, 122, 82, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.98);
+}
+
+#tp-translate-dot:active {
+  transform: scale(0.94);
 }
 
 #tp-translate-dot.tp-loading {
-  background: #9aa0a6;
   cursor: progress;
+  filter: grayscale(0.25) brightness(0.95);
+  animation: tp-pulse 750ms ease-in-out infinite;
 }
 
 #tp-translate-popup {
   position: absolute;
-  min-width: 220px;
-  max-width: 320px;
-  background: #ffffff;
-  color: #1f1f1f;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  min-width: 260px;
+  max-width: min(360px, calc(100vw - 24px));
+  color: #0f1821;
+  border: 1px solid rgba(17, 36, 61, 0.14);
+  border-radius: 14px;
+  background:
+    linear-gradient(150deg, rgba(233, 248, 255, 0.94), rgba(255, 255, 255, 0.98));
+  backdrop-filter: blur(8px);
+  box-shadow:
+    0 18px 34px rgba(13, 27, 42, 0.22),
+    0 2px 8px rgba(13, 27, 42, 0.12);
   z-index: 2147483647;
-  font-family: "Helvetica Neue", Arial, sans-serif;
+  overflow: hidden;
+  font-family: "Avenir Next", "SF Pro Display", "Segoe UI", "Noto Sans SC", sans-serif;
+  animation: tp-popup-in 160ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+#tp-translate-popup::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 85% at 0% 0%, rgba(131, 210, 255, 0.18) 0%, transparent 58%),
+    radial-gradient(100% 80% at 100% 100%, rgba(92, 220, 173, 0.12) 0%, transparent 60%);
 }
 
 #tp-translate-popup .tp-popup-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px 6px;
-  border-bottom: 1px solid #f2f2f2;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid rgba(17, 36, 61, 0.08);
 }
 
 #tp-translate-popup .tp-popup-title {
   font-size: 12px;
-  font-weight: 600;
-  color: #6b6b6b;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #35506f;
 }
 
 #tp-translate-popup .tp-popup-close {
-  border: none;
-  background: transparent;
-  color: #1f1f1f;
+  border: 1px solid rgba(31, 55, 86, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #173251;
   font-size: 12px;
+  line-height: 1;
+  padding: 6px 8px;
   cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+#tp-translate-popup .tp-popup-close:hover {
+  background: rgba(229, 244, 255, 0.95);
+  border-color: rgba(31, 55, 86, 0.25);
+  transform: translateY(-1px);
+}
+
+#tp-translate-popup .tp-popup-close:active {
+  transform: translateY(0);
 }
 
 #tp-translate-popup .tp-popup-content {
-  padding: 10px 12px 12px;
+  position: relative;
+  padding: 12px;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.58;
+  color: #15283f;
+  word-break: break-word;
 }
 
 #tp-translate-popup .tp-popup-error {
-  color: #d93025;
+  color: #b3261e;
+  font-weight: 600;
+}
+
+@keyframes tp-dot-in {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes tp-popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tp-pulse {
+  0% {
+    box-shadow:
+      0 8px 18px rgba(16, 122, 82, 0.35),
+      0 0 0 2px rgba(255, 255, 255, 0.92);
+  }
+  50% {
+    box-shadow:
+      0 8px 20px rgba(16, 122, 82, 0.45),
+      0 0 0 3px rgba(255, 255, 255, 1);
+  }
+  100% {
+    box-shadow:
+      0 8px 18px rgba(16, 122, 82, 0.35),
+      0 0 0 2px rgba(255, 255, 255, 0.92);
+  }
 }
