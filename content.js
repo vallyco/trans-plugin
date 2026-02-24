@@ -419,6 +419,7 @@ function hideTranslationPopup() {
     debugLog('Removed translation popup');
     translationDiv = null;
     isPopupVisible = false; // Reset popup visibility flag
+    buttonClicked = false; // Reset button clicked flag to allow new selections
   } else {
     debugLog('hideTranslationPopup called, but no translation popup to remove');
   }
@@ -437,6 +438,12 @@ document.addEventListener('mouseup', function(event) {
   // Skip if translation popup is already showing
   if (isPopupVisible) {
     debugLog('Skipping mouseup: popup is visible');
+    return;
+  }
+
+  // Skip if button was just clicked (to prevent re-creating button after deletion)
+  if (buttonClicked) {
+    debugLog('Skipping mouseup: button was just clicked');
     return;
   }
 
