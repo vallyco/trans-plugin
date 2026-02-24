@@ -1,6 +1,7 @@
 let selectedText = "";
 let translateDot = null;
 let translatePopup = null;
+let selectedRect = null;
 
 function removeDot() {
   if (translateDot) {
@@ -66,9 +67,12 @@ function createDot(rect) {
 
     dot.classList.add("tp-loading");
 
-    const dotRect = dot.getBoundingClientRect();
-    const popupTop = window.scrollY + dotRect.bottom + 8;
-    const popupLeft = window.scrollX + dotRect.left;
+    const popupTop = selectedRect
+      ? window.scrollY + selectedRect.bottom + 4
+      : window.scrollY + rect.bottom + 4;
+    const popupLeft = selectedRect
+      ? window.scrollX + selectedRect.left
+      : window.scrollX + rect.left;
 
     removeDot();
 
@@ -108,7 +112,6 @@ function showPopup(content, top, left, isError) {
   popup.innerHTML = `
     <div class="tp-popup-header">
       <span class="tp-popup-title">翻译结果</span>
-      <button type="button" class="tp-popup-close">关闭</button>
     </div>
     <div class="tp-popup-content ${isError ? "tp-popup-error" : ""}"></div>
   `;
@@ -116,15 +119,6 @@ function showPopup(content, top, left, isError) {
   const contentEl = popup.querySelector(".tp-popup-content");
   if (contentEl) {
     contentEl.textContent = content;
-  }
-
-  const closeBtn = popup.querySelector(".tp-popup-close");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      removePopup();
-    });
   }
 
   popup.addEventListener("mousedown", (event) => {
@@ -160,6 +154,7 @@ document.addEventListener("mouseup", (event) => {
   }
 
   selectedText = text;
+  selectedRect = rect;
   removePopup();
   createDot(rect);
 });
