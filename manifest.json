@@ -3,10 +3,11 @@
   "name": "Text Selection Translator",
   "description": "Select text on any page and translate it to Chinese.",
   "version": "1.0.0",
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "storage"],
   "host_permissions": [
     "https://fanyi.youdao.com/*",
-    "https://dict.youdao.com/*"
+    "https://dict.youdao.com/*",
+    "https://openapi.youdao.com/*"
   ],
   "background": {
     "service_worker": "background.js"

@@ -18,6 +18,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 async function translateToChinese(text) {
+  const config = await chrome.storage.local.get(["youdaoAppKey", "youdaoAppSecret"]);
+  const appKey = typeof config.youdaoAppKey === "string" ? config.youdaoAppKey.trim() : "";
+  const appSecret =
+    typeof config.youdaoAppSecret === "string" ? config.youdaoAppSecret.trim() : "";
+
+  if (appKey && appSecret) {
+    try {
+      const officialText = await translateByOfficialOpenApi(text, appKey, appSecret);
+      if (officialText) {
+        return officialText;
+      }
+    } catch (_error) {
+      // Fall through to web endpoints.
+    }
+  }
+
   const primaryUrl = "https://fanyi.youdao.com/translate";
   const primaryBody = new URLSearchParams({
     doctype: "json",
@@ -65,6 +81,10 @@ async function translateToChinese(text) {
     errors.push("Segment translation returned empty translation");
   } catch (error) {
     errors.push(error instanceof Error ? error.message : "Segment translation failed");
+  }
+
+  if (!appKey || !appSecret) {
+    errors.push("Missing Youdao OpenAPI credentials");
   }
 
   throw new Error(errors.join("; "));
@@ -188,4 +208,56 @@ function extractFallbackTranslation(data) {
   }
 
   return "";
+}
+
+async function translateByOfficialOpenApi(text, appKey, appSecret) {
+  const salt = String(Date.now());
+  const curtime = String(Math.floor(Date.now() / 1000));
+  const signStr = `${appKey}${truncateForSign(text)}${salt}${curtime}${appSecret}`;
+  const sign = await sha256Hex(signStr);
+
+  const body = new URLSearchParams({
+    q: text,
+    from: "auto",
+    to: "zh-CHS",
+    appKey,
+    salt,
+    sign,
+    signType: "v3",
+    curtime
+  }).toString();
+
+  const data = await requestJson("https://openapi.youdao.com/api", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    },
+    body
+  });
+
+  if (Array.isArray(data?.translation)) {
+    const translated = data.translation.join("").trim();
+    if (translated) {
+      return translated;
+    }
+  }
+
+  throw new Error(data?.errorCode ? `Youdao OpenAPI error: ${data.errorCode}` : "OpenAPI empty");
+}
+
+function truncateForSign(text) {
+  if (!text) {
+    return "";
+  }
+  if (text.length <= 20) {
+    return text;
+  }
+  return `${text.slice(0, 10)}${text.length}${text.slice(-10)}`;
+}
+
+async function sha256Hex(input) {
+  const bytes = new TextEncoder().encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
