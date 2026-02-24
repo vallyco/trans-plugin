@@ -1,173 +1,174 @@
-(() => {
-  const DOT_ID = "tp-translate-dot";
-  const POPUP_ID = "tp-translate-popup";
-  const STYLE_LOADING = "tp-loading";
-  let lastSelectionText = "";
+let selectedText = "";
+let translateDot = null;
+let translatePopup = null;
 
-  const getSelectionText = () => {
-    const selection = window.getSelection();
-    if (!selection) return "";
-    return selection.toString().trim();
-  };
+function removeDot() {
+  if (translateDot) {
+    translateDot.remove();
+    translateDot = null;
+  }
+}
 
-  const getSelectionRect = () => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return null;
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-    if (!rect || (rect.width === 0 && rect.height === 0)) return null;
+function removePopup() {
+  if (translatePopup) {
+    translatePopup.remove();
+    translatePopup = null;
+  }
+}
+
+function clearUi() {
+  removeDot();
+  removePopup();
+}
+
+function getSelectionRect(selection) {
+  if (!selection || selection.rangeCount === 0) {
+    return null;
+  }
+
+  const range = selection.getRangeAt(0);
+  const rect = range.getBoundingClientRect();
+  if (rect.width || rect.height) {
     return rect;
-  };
+  }
 
-  const removeDot = () => {
-    const existing = document.getElementById(DOT_ID);
-    if (existing) existing.remove();
-  };
+  const fallbackRects = range.getClientRects();
+  return fallbackRects.length > 0 ? fallbackRects[0] : null;
+}
 
-  const removePopup = () => {
-    const existing = document.getElementById(POPUP_ID);
-    if (existing) existing.remove();
-  };
+function createDot(rect) {
+  removeDot();
 
-  const createDot = (rect) => {
-    removeDot();
-    removePopup();
+  const dot = document.createElement("button");
+  dot.id = "tp-translate-dot";
+  dot.type = "button";
+  dot.title = "Translate to Chinese";
 
-    const dot = document.createElement("button");
-    dot.id = DOT_ID;
-    dot.type = "button";
-    dot.setAttribute("aria-label", "Translate selection");
+  const top = window.scrollY + rect.bottom + 8;
+  const left = window.scrollX + rect.left + rect.width / 2 - 7;
 
-    const scrollX = window.scrollX || window.pageXOffset;
-    const scrollY = window.scrollY || window.pageYOffset;
-    const top = rect.bottom + scrollY + 6;
-    const left = rect.left + scrollX;
+  dot.style.top = `${top}px`;
+  dot.style.left = `${Math.max(window.scrollX + 8, left)}px`;
 
-    dot.style.top = `${top}px`;
-    dot.style.left = `${left}px`;
+  dot.addEventListener("mousedown", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  });
 
-    dot.addEventListener("click", async (event) => {
-      event.stopPropagation();
-      dot.classList.add(STYLE_LOADING);
-      const text = lastSelectionText;
-      if (!text) {
-        removeDot();
-        return;
-      }
+  dot.addEventListener("click", async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-      try {
-        const translated = await translateText(text);
-        removeDot();
-        showPopup(translated, rect);
-      } catch (err) {
-        removeDot();
-        showPopup("翻译失败，请重试。", rect, true);
-      }
-    });
-
-    document.body.appendChild(dot);
-  };
-
-  const showPopup = (text, rect, isError = false) => {
-    removePopup();
-
-    const popup = document.createElement("div");
-    popup.id = POPUP_ID;
-
-    const header = document.createElement("div");
-    header.className = "tp-popup-header";
-
-    const title = document.createElement("div");
-    title.className = "tp-popup-title";
-    title.textContent = "翻译结果";
-
-    const closeBtn = document.createElement("button");
-    closeBtn.type = "button";
-    closeBtn.className = "tp-popup-close";
-    closeBtn.textContent = "关闭";
-    closeBtn.addEventListener("click", (event) => {
-      event.stopPropagation();
-      removePopup();
-    });
-
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-
-    const content = document.createElement("div");
-    content.className = "tp-popup-content";
-    content.textContent = text;
-    if (isError) content.classList.add("tp-popup-error");
-
-    popup.appendChild(header);
-    popup.appendChild(content);
-
-    const scrollX = window.scrollX || window.pageXOffset;
-    const scrollY = window.scrollY || window.pageYOffset;
-    const top = rect.bottom + scrollY + 10;
-    const left = rect.left + scrollX;
-
-    popup.style.top = `${top}px`;
-    popup.style.left = `${left}px`;
-
-    document.body.appendChild(popup);
-  };
-
-  const translateText = async (text) => {
-    const url = new URL("https://translate.googleapis.com/translate_a/single");
-    url.searchParams.set("client", "gtx");
-    url.searchParams.set("sl", "auto");
-    url.searchParams.set("tl", "zh-CN");
-    url.searchParams.set("dt", "t");
-    url.searchParams.set("q", text);
-
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error("translation_failed");
-    }
-
-    const data = await response.json();
-    if (!Array.isArray(data) || !Array.isArray(data[0])) {
-      throw new Error("invalid_response");
-    }
-
-    return data[0].map((item) => item[0]).join("");
-  };
-
-  const handleSelection = () => {
-    const text = getSelectionText();
-    if (!text) {
-      lastSelectionText = "";
-      removeDot();
+    if (!selectedText) {
+      clearUi();
       return;
     }
 
-    const rect = getSelectionRect();
-    if (!rect) return;
+    dot.classList.add("tp-loading");
 
-    lastSelectionText = text;
-    createDot(rect);
-  };
+    const dotRect = dot.getBoundingClientRect();
+    const popupTop = window.scrollY + dotRect.bottom + 8;
+    const popupLeft = window.scrollX + dotRect.left;
 
-  document.addEventListener("mouseup", () => {
-    setTimeout(handleSelection, 0);
-  });
+    removeDot();
 
-  document.addEventListener("keyup", (event) => {
-    if (event.key === "Shift" || event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      setTimeout(handleSelection, 0);
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: "translate",
+        text: selectedText
+      });
+
+      if (!response?.ok) {
+        throw new Error(response?.error || "Translation failed");
+      }
+
+      showPopup(response.translatedText, popupTop, popupLeft, false);
+    } catch (error) {
+      showPopup(
+        error instanceof Error ? error.message : "Translation failed",
+        popupTop,
+        popupLeft,
+        true
+      );
     }
   });
 
-  document.addEventListener("scroll", () => {
-    removeDot();
+  document.body.appendChild(dot);
+  translateDot = dot;
+}
+
+function showPopup(content, top, left, isError) {
+  removePopup();
+
+  const popup = document.createElement("div");
+  popup.id = "tp-translate-popup";
+  popup.style.top = `${top}px`;
+  popup.style.left = `${left}px`;
+
+  popup.innerHTML = `
+    <div class="tp-popup-header">
+      <span class="tp-popup-title">翻译结果</span>
+      <button type="button" class="tp-popup-close">关闭</button>
+    </div>
+    <div class="tp-popup-content ${isError ? "tp-popup-error" : ""}"></div>
+  `;
+
+  const contentEl = popup.querySelector(".tp-popup-content");
+  if (contentEl) {
+    contentEl.textContent = content;
+  }
+
+  const closeBtn = popup.querySelector(".tp-popup-close");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      removePopup();
+    });
+  }
+
+  popup.addEventListener("mousedown", (event) => {
+    event.stopPropagation();
   });
 
-  document.addEventListener("click", (event) => {
-    const target = event.target;
-    if (!target) return;
-    if (target.id === DOT_ID || target.id === POPUP_ID) return;
-    const popup = document.getElementById(POPUP_ID);
-    if (popup && popup.contains(target)) return;
-    removePopup();
-  });
-})();
+  document.body.appendChild(popup);
+  translatePopup = popup;
+}
+
+document.addEventListener("mouseup", () => {
+  const selection = window.getSelection();
+  const text = selection ? selection.toString().trim() : "";
+
+  if (!text) {
+    selectedText = "";
+    removeDot();
+    return;
+  }
+
+  const rect = getSelectionRect(selection);
+  if (!rect) {
+    return;
+  }
+
+  selectedText = text;
+  removePopup();
+  createDot(rect);
+});
+
+document.addEventListener("mousedown", (event) => {
+  const target = event.target;
+  if (!(target instanceof Element)) {
+    clearUi();
+    return;
+  }
+
+  const clickedDot = target.closest("#tp-translate-dot");
+  const clickedPopup = target.closest("#tp-translate-popup");
+  if (!clickedDot && !clickedPopup) {
+    clearUi();
+  }
+});
+
+window.addEventListener("scroll", () => {
+  removeDot();
+});
