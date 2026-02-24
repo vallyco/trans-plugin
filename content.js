@@ -172,7 +172,3 @@ document.addEventListener("mousedown", (event) => {
     clearUi();
   }
 });
-
-window.addEventListener("scroll", () => {
-  removeDot();
-});
