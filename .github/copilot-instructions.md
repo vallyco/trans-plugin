@@ -62,6 +62,44 @@ Developer steps to test changes
 # 4. Edit files, then click reload for this extension and refresh the target page
 ```
 
+Git Workflow for Changes
+
+After making code changes, follow these steps:
+
+1. Stage your changes:
+```bash
+git add .
+```
+
+2. Commit with descriptive message (follow convention):
+```bash
+# Types: feat (new feature), fix (bug fix), refactor (code refactoring), docs (documentation)
+git commit -m "feat: add new translation feature"
+git commit -m "fix: resolve popup timing issue"
+git commit -m "docs: update developer documentation"
+```
+
+3. Push to remote repository:
+```bash
+git push origin master
+```
+
+**Full workflow example:**
+```bash
+# Edit files in your editor
+# After making changes...
+git add content.js styles.css
+git commit -m "fix: improve button positioning"
+git push origin master
+```
+
+**Verify before pushing:**
+```bash
+git status          # Check what's staged
+git diff --cached   # Review staged changes
+git log --oneline -3  # See recent commits
+```
+
 Small code-edit patterns the agent should follow
 - When updating popup text: modify `.translation-text` in `showTranslationPopup()` instead of rebuilding the element (preserves listeners).
 - Preserve `debugLog()` or mirror its `[Translation Plugin]` prefix for all console traces.
