@@ -18,16 +18,25 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 async function translateToChinese(text) {
-  const primaryUrl =
-    "https://fanyi.youdao.com/translate" +
-    `?doctype=json&type=AUTO&i=${encodeURIComponent(text)}`;
+  const primaryUrl = "https://fanyi.youdao.com/translate";
+  const primaryBody = new URLSearchParams({
+    doctype: "json",
+    type: "AUTO",
+    i: text
+  }).toString();
   const fallbackUrl =
     "https://dict.youdao.com/jsonapi" + `?q=${encodeURIComponent(text)}`;
 
   const errors = [];
 
   try {
-    const primaryData = await requestJson(primaryUrl);
+    const primaryData = await requestJson(primaryUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+      },
+      body: primaryBody
+    });
     const primaryText = extractPrimaryTranslation(primaryData);
     if (primaryText) {
       return primaryText;
@@ -48,13 +57,25 @@ async function translateToChinese(text) {
     errors.push(error instanceof Error ? error.message : "Fallback endpoint failed");
   }
 
+  try {
+    const segmented = await translateBySegments(text);
+    if (segmented) {
+      return segmented;
+    }
+    errors.push("Segment translation returned empty translation");
+  } catch (error) {
+    errors.push(error instanceof Error ? error.message : "Segment translation failed");
+  }
+
   throw new Error(errors.join("; "));
 }
 
-async function requestJson(url) {
+async function requestJson(url, options = {}) {
   const response = await fetch(url, {
+    ...options,
     headers: {
-      Accept: "application/json, text/plain, */*"
+      Accept: "application/json, text/plain, */*",
+      ...(options.headers || {})
     }
   });
 
@@ -73,6 +94,67 @@ async function requestJson(url) {
   } catch (_error) {
     throw new Error("Endpoint returned invalid JSON");
   }
+}
+
+async function translateBySegments(text) {
+  const segments = splitTextForTranslation(text);
+  if (segments.length <= 1) {
+    return "";
+  }
+
+  const translated = [];
+  for (const segment of segments) {
+    const body = new URLSearchParams({
+      doctype: "json",
+      type: "AUTO",
+      i: segment
+    }).toString();
+    const data = await requestJson("https://fanyi.youdao.com/translate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+      },
+      body
+    });
+    const chunk = extractPrimaryTranslation(data);
+    if (!chunk) {
+      throw new Error("One segment returned empty translation");
+    }
+    translated.push(chunk);
+  }
+
+  return translated.join("");
+}
+
+function splitTextForTranslation(text) {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (!normalized) {
+    return [];
+  }
+
+  const MAX_LEN = 120;
+  if (normalized.length <= MAX_LEN) {
+    return [normalized];
+  }
+
+  const sentenceParts = normalized
+    .split(/(?<=[.!?;:。！？；：])/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const chunks = [];
+  for (const part of sentenceParts.length > 0 ? sentenceParts : [normalized]) {
+    if (part.length <= MAX_LEN) {
+      chunks.push(part);
+      continue;
+    }
+
+    for (let i = 0; i < part.length; i += MAX_LEN) {
+      chunks.push(part.slice(i, i + MAX_LEN));
+    }
+  }
+
+  return chunks;
 }
 
 function extractPrimaryTranslation(data) {
