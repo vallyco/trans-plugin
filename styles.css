@@ -1,55 +1,53 @@
 #tp-translate-dot {
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 12px;
+  height: 12px;
   border: none;
   border-radius: 999px;
-  background:
-    radial-gradient(circle at 30% 30%, #9ffad9 0%, #36d79c 40%, #1ca86f 100%);
+  background: #111111;
   box-shadow:
-    0 8px 18px rgba(16, 122, 82, 0.35),
-    0 0 0 2px rgba(255, 255, 255, 0.92);
+    0 6px 14px rgba(0, 0, 0, 0.16),
+    0 0 0 6px rgba(0, 0, 0, 0.04);
   cursor: pointer;
   z-index: 2147483647;
   transform: translateY(0) scale(1);
-  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
-  animation: tp-dot-in 140ms ease-out;
+  transition: transform 140ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  animation: tp-dot-in 160ms ease-out;
 }
 
 #tp-translate-dot:hover {
-  transform: translateY(-1px) scale(1.04);
+  transform: translateY(-1px) scale(1.05);
   box-shadow:
-    0 10px 20px rgba(16, 122, 82, 0.4),
-    0 0 0 2px rgba(255, 255, 255, 0.98);
+    0 10px 20px rgba(0, 0, 0, 0.18),
+    0 0 0 8px rgba(0, 0, 0, 0.05);
 }
 
 #tp-translate-dot:active {
-  transform: scale(0.94);
+  transform: scale(0.96);
 }
 
 #tp-translate-dot.tp-loading {
+  opacity: 0.7;
   cursor: progress;
-  filter: grayscale(0.25) brightness(0.95);
-  animation: tp-pulse 750ms ease-in-out infinite;
+  animation: tp-pulse 900ms ease-in-out infinite;
 }
 
 #tp-translate-popup {
   position: absolute;
   min-width: 260px;
-  max-width: min(360px, calc(100vw - 24px));
-  color: #0f1821;
-  border: 1px solid rgba(17, 36, 61, 0.14);
-  border-radius: 14px;
-  background:
-    linear-gradient(150deg, rgba(233, 248, 255, 0.94), rgba(255, 255, 255, 0.98));
-  backdrop-filter: blur(8px);
+  max-width: min(420px, calc(100vw - 28px));
+  color: #0b0b0b;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(14px) saturate(160%);
   box-shadow:
-    0 18px 34px rgba(13, 27, 42, 0.22),
-    0 2px 8px rgba(13, 27, 42, 0.12);
+    0 30px 70px rgba(0, 0, 0, 0.18),
+    0 2px 6px rgba(0, 0, 0, 0.08);
   z-index: 2147483647;
   overflow: hidden;
-  font-family: "Avenir Next", "SF Pro Display", "Segoe UI", "Noto Sans SC", sans-serif;
-  animation: tp-popup-in 160ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  font-family: "SF Pro Display", "SF Pro Text", -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  animation: tp-popup-in 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 #tp-translate-popup::before {
@@ -58,8 +56,8 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(120% 85% at 0% 0%, rgba(131, 210, 255, 0.18) 0%, transparent 58%),
-    radial-gradient(100% 80% at 100% 100%, rgba(92, 220, 173, 0.12) 0%, transparent 60%);
+    radial-gradient(120% 80% at 0% 0%, rgba(0, 0, 0, 0.04) 0%, transparent 50%),
+    radial-gradient(90% 70% at 100% 100%, rgba(0, 0, 0, 0.06) 0%, transparent 55%);
 }
 
 #tp-translate-popup .tp-popup-header {
@@ -67,46 +65,24 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 10px 12px 8px;
-  border-bottom: 1px solid rgba(17, 36, 61, 0.08);
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 #tp-translate-popup .tp-popup-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #35506f;
-}
-
-#tp-translate-popup .tp-popup-close {
-  border: 1px solid rgba(31, 55, 86, 0.16);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.72);
-  color: #173251;
-  font-size: 12px;
-  line-height: 1;
-  padding: 6px 8px;
-  cursor: pointer;
-  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
-}
-
-#tp-translate-popup .tp-popup-close:hover {
-  background: rgba(229, 244, 255, 0.95);
-  border-color: rgba(31, 55, 86, 0.25);
-  transform: translateY(-1px);
-}
-
-#tp-translate-popup .tp-popup-close:active {
-  transform: translateY(0);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 #tp-translate-popup .tp-popup-content {
   position: relative;
-  padding: 12px;
+  padding: 12px 16px 16px;
   font-size: 14px;
-  line-height: 1.58;
-  color: #15283f;
+  line-height: 1.65;
+  color: #0b0b0b;
   word-break: break-word;
   white-space: pre-line;
 }
@@ -130,7 +106,7 @@
 @keyframes tp-popup-in {
   from {
     opacity: 0;
-    transform: translateY(-4px) scale(0.98);
+    transform: translateY(-6px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -141,17 +117,17 @@
 @keyframes tp-pulse {
   0% {
     box-shadow:
-      0 8px 18px rgba(16, 122, 82, 0.35),
-      0 0 0 2px rgba(255, 255, 255, 0.92);
+      0 6px 14px rgba(0, 0, 0, 0.16),
+      0 0 0 6px rgba(0, 0, 0, 0.04);
   }
   50% {
     box-shadow:
-      0 8px 20px rgba(16, 122, 82, 0.45),
-      0 0 0 3px rgba(255, 255, 255, 1);
+      0 10px 22px rgba(0, 0, 0, 0.2),
+      0 0 0 10px rgba(0, 0, 0, 0.06);
   }
   100% {
     box-shadow:
-      0 8px 18px rgba(16, 122, 82, 0.35),
-      0 0 0 2px rgba(255, 255, 255, 0.92);
+      0 6px 14px rgba(0, 0, 0, 0.16),
+      0 0 0 6px rgba(0, 0, 0, 0.04);
   }
 }
