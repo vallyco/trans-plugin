@@ -235,7 +235,7 @@ async function lookupWordMeanings(word) {
     return "";
   }
 
-  return meanings.map((item, index) => `${index + 1}. ${item}`).join("\n");
+  return meanings.map((item) => `• ${item}`).join("\n");
 }
 
 function extractWordMeaningItems(data) {
