@@ -13,8 +13,7 @@
   border-radius: 999px;
   background: var(--tp-dot-color);
   box-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.16),
-    0 0 0 6px var(--tp-dot-ring);
+    0 6px 14px rgba(0, 0, 0, 0.16);
   cursor: pointer;
   z-index: 2147483647;
   transform: translateY(0) scale(1);
@@ -25,8 +24,7 @@
 #tp-translate-dot:hover {
   transform: translateY(-1px) scale(1.05);
   box-shadow:
-    0 10px 20px rgba(0, 0, 0, 0.18),
-    0 0 0 8px var(--tp-dot-ring-strong);
+    0 10px 20px rgba(0, 0, 0, 0.18);
 }
 
 #tp-translate-dot:active {
@@ -124,17 +122,14 @@
 @keyframes tp-pulse {
   0% {
     box-shadow:
-      0 6px 14px rgba(0, 0, 0, 0.16),
-      0 0 0 6px var(--tp-dot-ring);
+      0 6px 14px rgba(0, 0, 0, 0.16);
   }
   50% {
     box-shadow:
-      0 10px 22px rgba(0, 0, 0, 0.2),
-      0 0 0 10px var(--tp-dot-ring-pulse);
+      0 10px 22px rgba(0, 0, 0, 0.2);
   }
   100% {
     box-shadow:
-      0 6px 14px rgba(0, 0, 0, 0.16),
-      0 0 0 6px var(--tp-dot-ring);
+      0 6px 14px rgba(0, 0, 0, 0.16);
   }
 }
