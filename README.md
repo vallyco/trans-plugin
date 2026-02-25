@@ -1,13 +1,14 @@
-# Text Translation Chrome Extension
+# Text Selection Translator
 
-A Chrome extension that allows users to select text on any webpage and instantly see its translation.
+A Chrome extension that translates selected text to Chinese and shows dictionary meanings for single words.
 
 ## Features
 
-- Select any text on a webpage to see a green dot appear below
-- Click the green dot to translate the selected text
-- Automatic language detection
-- Clean, minimal popup interface
+- Select text on any page to show a small dot after the selection
+- Click the dot to translate the selection
+- Single word selection shows multiple dictionary meanings
+- Multi-word selection shows full text translation
+- Popup appears centered beneath the selected text
 - Works on any website
 
 ## Installation
@@ -16,48 +17,43 @@ A Chrome extension that allows users to select text on any webpage and instantly
 2. Open Chrome and navigate to `chrome://extensions`
 3. Enable "Developer mode" (toggle in upper-right corner)
 4. Click "Load unpacked" and select this directory
-5. The extension icon should now appear in your browser toolbar
+
+## Configuration (Youdao OpenAPI)
+
+For stable translation in China, configure Youdao OpenAPI credentials:
+
+1. Create an app in Youdao AI Platform and obtain `appKey` and `appSecret`
+2. Open `chrome://extensions`, find this extension, click "Details"
+3. Open "Extension options"
+4. Fill in `App Key` and `App Secret`, then save
+
+Without credentials, the extension falls back to web endpoints, which may be unstable.
 
 ## Usage
 
-1. Navigate to any webpage
-2. Select text by clicking and dragging over it
-3. A green dot will appear below the selected text
-4. Click the green dot to translate the text
-5. The translation will appear in a popup near the dot
-6. Click anywhere on the page to dismiss the popup
+1. Select a word or sentence on any webpage
+2. Click the dot shown after the selection
+3. The popup appears under the selected text
+4. Click elsewhere to dismiss the popup
 
 ## How It Works
 
-The extension uses:
-- Content scripts to detect text selection on webpages
-- Google Translate API for translation services
-- A floating DOM element to display translations
-- An interactive green dot that triggers translation on click
+- Content script detects selection and renders the dot and popup
+- Background service worker calls Youdao OpenAPI or fallback endpoints
+- Popup shows dictionary meanings for single words or translations for sentences
 
 ## Files
 
 - `manifest.json`: Extension configuration and permissions
-- `content.js`: Main logic for detecting selection and handling translations
-- `styles.css`: Styling for the translation popup and green dot
-- `popup.html`: Browser action popup interface
-- `popup.js`: Popup interface logic
-
-## Development & Git Workflow
-
-When making changes to the extension, follow this workflow:
-
-### 1. Make code changes
-Edit the relevant files (e.g., `content.js`, `styles.css`, etc.)
-
-### 2. Reload extension in Chrome
-- Open `chrome://extensions`
-- Click the reload button on this extension
-- Refresh the webpage to test changes
+- `content.js`: Selection handling and popup UI
+- `background.js`: Translation/dictionary requests
+- `styles.css`: Dot and popup styling
+- `options.html`: Options page UI
+- `options.js`: Options page logic
 
 ## Privacy
 
-This extension does not collect or store any personal data. All translations are processed through Google's public translation API.
+This extension does not collect or store personal data. Credentials are stored locally via `chrome.storage.local`.
 
 ## License
 
