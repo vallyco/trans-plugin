@@ -42,6 +42,20 @@ Without credentials, the extension falls back to web endpoints, which may be uns
 - Background service worker calls Youdao OpenAPI or fallback endpoints
 - Popup shows dictionary meanings for single words or translations for sentences
 
+## Runtime Flow
+
+```
+User selects text
+  -> content/main.js listens mouseup
+  -> content/selection.js returns last rect + text
+  -> content/ui.js renders dot after selection
+  -> user clicks dot
+  -> content/ui.js sends message to background.js
+  -> background.js chooses dictionary/translation route
+  -> result returned to content/ui.js
+  -> popup rendered under selection
+```
+
 ## Files
 
 - `manifest.json`: Extension configuration and permissions

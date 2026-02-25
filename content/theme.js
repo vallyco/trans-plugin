@@ -1,3 +1,4 @@
+// 模块说明：主题配置（小圆点颜色）
 const tp = window.__tpTranslate || (window.__tpTranslate = {});
 
 const DEFAULT_DOT_COLOR = "#2b2b2b";

@@ -1,3 +1,4 @@
+// 模块说明：后台翻译服务与接口编排
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== "translate" || !message.text) {
     return false;

@@ -1,3 +1,4 @@
+// 模块说明：UI 创建与交互（小圆点 / 弹窗）
 const tp = window.__tpTranslate || (window.__tpTranslate = {});
 
 // 移除小圆点

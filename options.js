@@ -1,3 +1,4 @@
+// 模块说明：设置页逻辑（配置读写）
 // 读取表单控件
 const form = document.getElementById("settings-form");
 const appKeyInput = document.getElementById("app-key");

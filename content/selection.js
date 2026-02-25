@@ -1,3 +1,4 @@
+// 模块说明：选区解析与位置计算
 const tp = window.__tpTranslate || (window.__tpTranslate = {});
 
 // 获取选区的最后一个矩形，用于定位尾部
