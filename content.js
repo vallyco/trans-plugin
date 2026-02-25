@@ -50,7 +50,7 @@ function createDot(rect) {
   dot.title = "Translate to Chinese";
 
   const top = window.scrollY + rect.bottom + 8;
-  const left = window.scrollX + rect.right + 6;
+  const left = window.scrollX + rect.right - 7;
 
   dot.style.top = `${top}px`;
   dot.style.left = `${Math.max(window.scrollX + 8, left)}px`;
@@ -75,8 +75,8 @@ function createDot(rect) {
       ? window.scrollY + selectedRect.bottom + 4
       : window.scrollY + rect.bottom + 4;
     const popupLeft = selectedRect
-      ? window.scrollX + selectedRect.right + 6
-      : window.scrollX + rect.right + 6;
+      ? window.scrollX + selectedRect.right - 12
+      : window.scrollX + rect.right - 12;
 
     removeDot();
 
