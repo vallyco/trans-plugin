@@ -50,7 +50,7 @@ function createDot(rect) {
   dot.title = "Translate to Chinese";
 
   const top = window.scrollY + rect.bottom + 8;
-  const left = window.scrollX + rect.right - 7;
+  const left = window.scrollX + rect.left + rect.width / 2 - 9;
 
   dot.style.top = `${top}px`;
   dot.style.left = `${Math.max(window.scrollX + 8, left)}px`;
@@ -74,9 +74,9 @@ function createDot(rect) {
     const popupTop = selectedRect
       ? window.scrollY + selectedRect.bottom + 4
       : window.scrollY + rect.bottom + 4;
-    const popupLeft = selectedRect
-      ? window.scrollX + selectedRect.right - 12
-      : window.scrollX + rect.right - 12;
+    const popupAnchorX = selectedRect
+      ? window.scrollX + selectedRect.left + selectedRect.width / 2
+      : window.scrollX + rect.left + rect.width / 2;
 
     removeDot();
 
@@ -90,12 +90,12 @@ function createDot(rect) {
         throw new Error(response?.error || "Translation failed");
       }
 
-      showPopup(response.translatedText, popupTop, popupLeft, false);
+      showPopup(response.translatedText, popupTop, popupAnchorX, false);
     } catch (error) {
       showPopup(
         error instanceof Error ? error.message : "Translation failed",
         popupTop,
-        popupLeft,
+        popupAnchorX,
         true
       );
     }
@@ -105,13 +105,13 @@ function createDot(rect) {
   translateDot = dot;
 }
 
-function showPopup(content, top, left, isError) {
+function showPopup(content, top, anchorX, isError) {
   removePopup();
 
   const popup = document.createElement("div");
   popup.id = "tp-translate-popup";
   popup.style.top = `${top}px`;
-  popup.style.left = `${left}px`;
+  popup.style.left = `${Math.max(window.scrollX + 8, anchorX - 140)}px`;
 
   popup.innerHTML = `
     <div class="tp-popup-header">
@@ -131,6 +131,10 @@ function showPopup(content, top, left, isError) {
 
   document.body.appendChild(popup);
   translatePopup = popup;
+
+  const popupRect = popup.getBoundingClientRect();
+  const centeredLeft = anchorX - popupRect.width / 2;
+  popup.style.left = `${Math.max(window.scrollX + 8, centeredLeft)}px`;
 }
 
 document.addEventListener("mouseup", (event) => {
