@@ -50,7 +50,7 @@ function createDot(rect) {
   dot.title = "Translate to Chinese";
 
   const top = window.scrollY + rect.bottom + 8;
-  const left = window.scrollX + rect.left + rect.width / 2 - 9;
+  const left = window.scrollX + rect.right - 7;
 
   dot.style.top = `${top}px`;
   dot.style.left = `${Math.max(window.scrollX + 8, left)}px`;
