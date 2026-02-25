@@ -28,13 +28,17 @@ function getSelectionRect(selection) {
   }
 
   const range = selection.getRangeAt(0);
+  const fallbackRects = range.getClientRects();
+  if (fallbackRects.length > 0) {
+    return fallbackRects[fallbackRects.length - 1];
+  }
+
   const rect = range.getBoundingClientRect();
   if (rect.width || rect.height) {
     return rect;
   }
 
-  const fallbackRects = range.getClientRects();
-  return fallbackRects.length > 0 ? fallbackRects[0] : null;
+  return null;
 }
 
 function createDot(rect) {
@@ -46,7 +50,7 @@ function createDot(rect) {
   dot.title = "Translate to Chinese";
 
   const top = window.scrollY + rect.bottom + 8;
-  const left = window.scrollX + rect.left + rect.width / 2 - 7;
+  const left = window.scrollX + rect.right + 6;
 
   dot.style.top = `${top}px`;
   dot.style.left = `${Math.max(window.scrollX + 8, left)}px`;
@@ -71,8 +75,8 @@ function createDot(rect) {
       ? window.scrollY + selectedRect.bottom + 4
       : window.scrollY + rect.bottom + 4;
     const popupLeft = selectedRect
-      ? window.scrollX + selectedRect.left
-      : window.scrollX + rect.left;
+      ? window.scrollX + selectedRect.right + 6
+      : window.scrollX + rect.right + 6;
 
     removeDot();
 
