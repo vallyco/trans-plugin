@@ -92,6 +92,7 @@ tp.createDot = function createDot(rect) {
     const popupAnchorX = window.scrollX + rectForPopup.left + rectForPopup.width / 2;
 
     tp.removeDot();
+    tp.showPopup("翻译中...", popupTop, popupAnchorX, false);
 
     try {
       const response = await chrome.runtime.sendMessage({
