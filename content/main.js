@@ -1,5 +1,5 @@
 // 模块说明：入口事件绑定
-const tp = window.__tpTranslate || (window.__tpTranslate = {});
+var tp = window.__tpTranslate || (window.__tpTranslate = {});
 
 // 处理选区变化并显示小圆点
 document.addEventListener("mouseup", (event) => {
