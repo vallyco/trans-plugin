@@ -253,7 +253,13 @@ async function lookupWordMeanings(word) {
     return "";
   }
 
-  return meanings.map((item) => `• ${item}`).join("\n");
+  const phonetic = extractUsPhonetic(data);
+  const lines = [];
+  if (phonetic) {
+    lines.push(`美式音标: /${phonetic}/`);
+  }
+  lines.push(...meanings.map((item) => `• ${item}`));
+  return lines.join("\n");
 }
 
 function extractWordMeaningItems(data) {
@@ -279,6 +285,14 @@ function extractWordMeaningItems(data) {
     .filter(Boolean);
 
   return Array.from(new Set(items)).slice(0, 8);
+}
+
+function extractUsPhonetic(data) {
+  if (!Array.isArray(data?.ec?.word) || data.ec.word.length === 0) {
+    return "";
+  }
+  const entry = data.ec.word[0];
+  return entry?.usphone || entry?.phone || "";
 }
 
 // 调用有道官方 OpenAPI 翻译
