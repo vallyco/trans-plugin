@@ -3,6 +3,11 @@ let translateDot = null;
 let translatePopup = null;
 let selectedRect = null;
 
+const DEFAULT_DOT_COLOR = "#2b2b2b";
+const DEFAULT_DOT_RING = "#ffffff";
+const DEFAULT_DOT_RING_STRONG = "rgba(255, 255, 255, 0.12)";
+const DEFAULT_DOT_RING_PULSE = "rgba(255, 255, 255, 0.14)";
+
 function removeDot() {
   if (translateDot) {
     translateDot.remove();
@@ -21,6 +26,56 @@ function clearUi() {
   removeDot();
   removePopup();
 }
+
+async function loadDotTheme() {
+  try {
+    const { dotColor, dotRing } = await chrome.storage.local.get([
+      "dotColor",
+      "dotRing"
+    ]);
+    applyDotTheme(dotColor, dotRing);
+  } catch (_error) {
+    applyDotTheme();
+  }
+}
+
+function applyDotTheme(dotColor = DEFAULT_DOT_COLOR, dotRing = DEFAULT_DOT_RING) {
+  const root = document.documentElement;
+  const ringRgb = parseHexColor(dotRing) || { r: 255, g: 255, b: 255 };
+  root.style.setProperty("--tp-dot-color", dotColor || DEFAULT_DOT_COLOR);
+  root.style.setProperty("--tp-dot-ring", rgba(ringRgb, 0.08));
+  root.style.setProperty("--tp-dot-ring-strong", rgba(ringRgb, 0.12));
+  root.style.setProperty("--tp-dot-ring-pulse", rgba(ringRgb, 0.18));
+}
+
+function parseHexColor(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const hex = value.trim().replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) {
+    return null;
+  }
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  return { r, g, b };
+}
+
+function rgba(color, alpha) {
+  return `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+}
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "local") {
+    return;
+  }
+  if (changes.dotColor || changes.dotRing) {
+    const dotColor = changes.dotColor?.newValue;
+    const dotRing = changes.dotRing?.newValue;
+    applyDotTheme(dotColor, dotRing);
+  }
+});
 
 function getSelectionRect(selection) {
   if (!selection || selection.rangeCount === 0) {
@@ -180,3 +235,5 @@ document.addEventListener("mousedown", (event) => {
     clearUi();
   }
 });
+
+loadDotTheme();

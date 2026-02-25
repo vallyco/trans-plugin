@@ -1,13 +1,17 @@
 #tp-translate-dot {
+  --tp-dot-color: #2b2b2b;
+  --tp-dot-ring: rgba(255, 255, 255, 0.08);
+  --tp-dot-ring-strong: rgba(255, 255, 255, 0.12);
+  --tp-dot-ring-pulse: rgba(255, 255, 255, 0.14);
   position: absolute;
   width: 12px;
   height: 12px;
   border: none;
   border-radius: 999px;
-  background: #2b2b2b;
+  background: var(--tp-dot-color);
   box-shadow:
     0 6px 14px rgba(0, 0, 0, 0.16),
-    0 0 0 6px rgba(255, 255, 255, 0.08);
+    0 0 0 6px var(--tp-dot-ring);
   cursor: pointer;
   z-index: 2147483647;
   transform: translateY(0) scale(1);
@@ -19,7 +23,7 @@
   transform: translateY(-1px) scale(1.05);
   box-shadow:
     0 10px 20px rgba(0, 0, 0, 0.18),
-    0 0 0 8px rgba(255, 255, 255, 0.12);
+    0 0 0 8px var(--tp-dot-ring-strong);
 }
 
 #tp-translate-dot:active {
@@ -118,16 +122,16 @@
   0% {
     box-shadow:
       0 6px 14px rgba(0, 0, 0, 0.16),
-      0 0 0 6px rgba(255, 255, 255, 0.08);
+      0 0 0 6px var(--tp-dot-ring);
   }
   50% {
     box-shadow:
       0 10px 22px rgba(0, 0, 0, 0.2),
-      0 0 0 10px rgba(255, 255, 255, 0.14);
+      0 0 0 10px var(--tp-dot-ring-pulse);
   }
   100% {
     box-shadow:
       0 6px 14px rgba(0, 0, 0, 0.16),
-      0 0 0 6px rgba(255, 255, 255, 0.08);
+      0 0 0 6px var(--tp-dot-ring);
   }
 }
