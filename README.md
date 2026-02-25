@@ -55,28 +55,6 @@ Edit the relevant files (e.g., `content.js`, `styles.css`, etc.)
 - Click the reload button on this extension
 - Refresh the webpage to test changes
 
-### 3. Commit changes with git
-```bash
-git add .
-git commit -m "type: brief description"
-# Examples:
-# git commit -m "feat: add new translation feature"
-# git commit -m "fix: resolve translation popup timing issue"
-# git commit -m "refactor: improve code readability"
-```
-
-### 4. Push to remote repository
-```bash
-git push origin master
-```
-
-### Commit Message Convention
-- `feat:` New feature
-- `fix:` Bug fix
-- `refactor:` Code refactoring
-- `docs:` Documentation update
-- `style:` Code style changes
-
 ## Privacy
 
 This extension does not collect or store any personal data. All translations are processed through Google's public translation API.
