@@ -17,6 +17,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   return true;
 });
 
+// 处理翻译请求（优先词典含义，后续走翻译链路）
 async function translateToChinese(text) {
   const normalizedText = text.trim();
   if (isSingleWord(normalizedText)) {
@@ -222,10 +223,12 @@ function extractFallbackTranslation(data) {
   return "";
 }
 
+// 判断是否为单词
 function isSingleWord(text) {
   return /^[A-Za-z]+(?:['-][A-Za-z]+)*$/.test(text);
 }
 
+// 查询单词多义项
 async function lookupWordMeanings(word) {
   const data = await requestJson(
     "https://dict.youdao.com/jsonapi" + `?q=${encodeURIComponent(word)}`
@@ -263,6 +266,7 @@ function extractWordMeaningItems(data) {
   return Array.from(new Set(items)).slice(0, 8);
 }
 
+// 调用有道官方 OpenAPI 翻译
 async function translateByOfficialOpenApi(text, appKey, appSecret) {
   const salt = String(Date.now());
   const curtime = String(Math.floor(Date.now() / 1000));
@@ -308,6 +312,7 @@ function truncateForSign(text) {
   return `${text.slice(0, 10)}${text.length}${text.slice(-10)}`;
 }
 
+// 计算 SHA-256 签名
 async function sha256Hex(input) {
   const bytes = new TextEncoder().encode(input);
   const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);

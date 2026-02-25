@@ -1,3 +1,4 @@
+// 读取表单控件
 const form = document.getElementById("settings-form");
 const appKeyInput = document.getElementById("app-key");
 const appSecretInput = document.getElementById("app-secret");
@@ -6,11 +7,13 @@ const statusEl = document.getElementById("status");
 
 const DEFAULT_DOT_COLOR = "#2b2b2b";
 
+// 更新保存状态提示
 function setStatus(text, isError = false) {
   statusEl.textContent = text;
   statusEl.classList.toggle("error", isError);
 }
 
+// 从本地存储加载配置
 async function loadSettings() {
   try {
     const {
@@ -32,6 +35,7 @@ async function loadSettings() {
   }
 }
 
+// 保存配置到本地存储
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 

@@ -45,7 +45,11 @@ Without credentials, the extension falls back to web endpoints, which may be uns
 ## Files
 
 - `manifest.json`: Extension configuration and permissions
-- `content.js`: Selection handling and popup UI
+- `content/shared.js`: Shared state
+- `content/theme.js`: Dot color theme
+- `content/selection.js`: Selection detection helpers
+- `content/ui.js`: Dot and popup UI
+- `content/main.js`: Event wiring
 - `background.js`: Translation/dictionary requests
 - `styles.css`: Dot and popup styling
 - `options.html`: Options page UI
