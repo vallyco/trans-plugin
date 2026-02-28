@@ -68,6 +68,7 @@
 - `styles.css`: 圆点与弹窗样式
 - `options.html`: 配置页 UI
 - `options.js`: 配置页逻辑
+- `DEVELOPMENT_GUIDE.md`: 开发规范与经验提炼
 
 ## 隐私
 
