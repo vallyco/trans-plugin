@@ -1,8 +1,5 @@
 :root {
   --tp-dot-color: #2b2b2b;
-  --tp-dot-ring: rgba(255, 255, 255, 0.08);
-  --tp-dot-ring-strong: rgba(255, 255, 255, 0.12);
-  --tp-dot-ring-pulse: rgba(255, 255, 255, 0.14);
 }
 
 #tp-translate-dot {

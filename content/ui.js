@@ -74,7 +74,7 @@ tp.showPopup = function showPopup(content, top, anchorX, anchorTop, isError) {
   popup.style.left = `${clampedLeft}px`;
 
   const desiredBottom = top + popupRect.height;
-  if (desiredBottom > viewportBottom && anchorTop) {
+  if (desiredBottom > viewportBottom && anchorTop != null) {
     const aboveTop = anchorTop - popupRect.height - 6;
     if (aboveTop >= viewportTop) {
       popup.style.top = `${aboveTop}px`;
@@ -125,7 +125,7 @@ tp.createDot = function createDot(rect) {
     const popupAnchorTop = window.scrollY + rectForPopup.top;
 
     tp.removeDot();
-    tp.showPopup("翻译中...", popupTop, popupAnchorX, false);
+    tp.showPopup("翻译中...", popupTop, popupAnchorX, popupAnchorTop, false);
 
     try {
       const response = await chrome.runtime.sendMessage({

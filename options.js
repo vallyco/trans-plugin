@@ -44,11 +44,6 @@ form.addEventListener("submit", async (event) => {
   const appSecret = appSecretInput.value.trim();
   const dotColor = dotColorInput.value || DEFAULT_DOT_COLOR;
 
-  if (!appKey || !appSecret) {
-    setStatus("App Key 和 App Secret 不能为空", true);
-    return;
-  }
-
   try {
     await chrome.storage.local.set({
       youdaoAppKey: appKey,
