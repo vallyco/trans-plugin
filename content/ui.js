@@ -24,7 +24,7 @@ tp.clearUi = function clearUi() {
 };
 
 // 显示翻译弹窗
-tp.showPopup = function showPopup(content, top, anchorX, isError) {
+tp.showPopup = function showPopup(content, top, anchorX, anchorTop, isError) {
   tp.removePopup();
 
   const popup = document.createElement("div");
@@ -52,8 +52,31 @@ tp.showPopup = function showPopup(content, top, anchorX, isError) {
   tp.state.popupEl = popup;
 
   const popupRect = popup.getBoundingClientRect();
+  const viewportLeft = window.scrollX + 8;
+  const viewportRight = window.scrollX + window.innerWidth - 8;
+  const viewportTop = window.scrollY + 8;
+  const viewportBottom = window.scrollY + window.innerHeight - 8;
+
   const centeredLeft = anchorX - popupRect.width / 2;
-  popup.style.left = `${Math.max(window.scrollX + 8, centeredLeft)}px`;
+  const clampedLeft = Math.min(
+    Math.max(centeredLeft, viewportLeft),
+    viewportRight - popupRect.width
+  );
+  popup.style.left = `${clampedLeft}px`;
+
+  const desiredBottom = top + popupRect.height;
+  if (desiredBottom > viewportBottom && anchorTop) {
+    const aboveTop = anchorTop - popupRect.height - 6;
+    if (aboveTop >= viewportTop) {
+      popup.style.top = `${aboveTop}px`;
+    } else {
+      const clampedTop = Math.min(
+        Math.max(top, viewportTop),
+        viewportBottom - popupRect.height
+      );
+      popup.style.top = `${clampedTop}px`;
+    }
+  }
 };
 
 // 创建小圆点并绑定点击逻辑
@@ -90,6 +113,7 @@ tp.createDot = function createDot(rect) {
     const rectForPopup = tp.state.selectedRect || rect;
     const popupTop = window.scrollY + rectForPopup.bottom + 4;
     const popupAnchorX = window.scrollX + rectForPopup.left + rectForPopup.width / 2;
+    const popupAnchorTop = window.scrollY + rectForPopup.top;
 
     tp.removeDot();
     tp.showPopup("翻译中...", popupTop, popupAnchorX, false);
@@ -104,12 +128,13 @@ tp.createDot = function createDot(rect) {
         throw new Error(response?.error || "Translation failed");
       }
 
-      tp.showPopup(response.translatedText, popupTop, popupAnchorX, false);
+      tp.showPopup(response.translatedText, popupTop, popupAnchorX, popupAnchorTop, false);
     } catch (error) {
       tp.showPopup(
         error instanceof Error ? error.message : "Translation failed",
         popupTop,
         popupAnchorX,
+        popupAnchorTop,
         true
       );
     }
