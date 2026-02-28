@@ -58,8 +58,17 @@ tp.showPopup = function showPopup(content, top, anchorX, anchorTop, isError) {
   const viewportBottom = window.scrollY + window.innerHeight - 8;
 
   const centeredLeft = anchorX - popupRect.width / 2;
+  const spaceRight = viewportRight - (anchorX + popupRect.width / 2);
+  const spaceLeft = anchorX - popupRect.width / 2 - viewportLeft;
+  let finalLeft = centeredLeft;
+  if (spaceRight < 0 && spaceLeft >= 0) {
+    finalLeft = anchorX - popupRect.width;
+  }
+  if (spaceLeft < 0 && spaceRight >= 0) {
+    finalLeft = anchorX;
+  }
   const clampedLeft = Math.min(
-    Math.max(centeredLeft, viewportLeft),
+    Math.max(finalLeft, viewportLeft),
     viewportRight - popupRect.width
   );
   popup.style.left = `${clampedLeft}px`;
